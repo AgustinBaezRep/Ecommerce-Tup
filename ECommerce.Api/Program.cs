@@ -1,5 +1,5 @@
+using Ecommerce.Application.IRepositories;
 using Ecommerce.Application.IServices;
-using Ecommerce.Application.Repositories;
 using Ecommerce.Application.Services;
 using ECommerce.Infraestructure.Context;
 using ECommerce.Infraestructure.Repositories;

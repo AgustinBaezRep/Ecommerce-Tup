@@ -1,6 +1,9 @@
-﻿using Ecommerce.Application.Repositories;
-using ECommerce.Domain.Models;
+﻿using Ecommerce.Application.IRepositories;
+using ECommerce.Domain.DTOs;
+using ECommerce.Domain.Entities;
+using ECommerce.Domain.ViewModels;
 using ECommerce.Infraestructure.Context;
+using System.ComponentModel;
 
 namespace ECommerce.Infraestructure.Repositories
 {
@@ -13,24 +16,85 @@ namespace ECommerce.Infraestructure.Repositories
             _context = context;
         }
 
-        public IEnumerable<Producto?> GetProductList()
+        public IEnumerable<ProductoConComponentesDTO> GetCombination()
         {
-            return _context.Productos.Where(p => p.Activo).ToList();
+            return _context.Productos
+                    .Join(
+                        _context.Componentes,
+                        p => p.Id,
+                        c => c.Producto.Id,
+                        (p, c) => new { Producto = p, Componente = c }
+                    )
+                    .GroupBy(
+                        pc => new { pc.Producto.Id, pc.Producto.Descripcion, pc.Producto.PrecioUnitario },
+                        pc => pc.Componente,
+                        (key, componentes) => new ProductoConComponentesDTO
+                        {
+                            DescripcionProducto = key.Descripcion,
+                            PrecioProducto = key.PrecioUnitario,
+                            Componentes = componentes.Select(c => new ComponenteDTO
+                            {
+                                DescripcionComponente = c.Descripcion,
+                                PrecioComponente = c.Precio
+                            }).ToList()
+                        }
+                    )
+                    .ToList();
         }
 
-        public Producto? GetById(Guid id)
+        public IEnumerable<ProductoDTO?> GetProductList()
         {
-            return _context.Productos.FirstOrDefault(x => x.Id == id && x.Activo);
+            return _context.Productos
+                .Where(p => p.Activo)
+                .Select(p => new ProductoDTO
+                {
+                    Id = p.Id,
+                    Descripcion = p.Descripcion,
+                    PrecioUnitario = p.PrecioUnitario,
+                    Stock = p.Stock,
+                    Activo = p.Activo
+                })
+                .ToList();
         }
 
-        public bool CreateProduct(Producto producto)
+        public ProductoDTO? GetById(Guid id)
         {
-            _context.Productos.Add(producto);
+            return _context.Productos
+                .Where(x => x.Id == id && x.Activo)
+                .Select(p => new ProductoDTO
+                {
+                    Id = p.Id,
+                    Descripcion = p.Descripcion,
+                    PrecioUnitario = p.PrecioUnitario,
+                    Stock = p.Stock,
+                    Activo = p.Activo
+                })
+                .FirstOrDefault();
+        }
+
+        public bool CreateProduct(CreateProductoViewModel producto)
+        {
+            producto.Id = Guid.NewGuid();
+            var prod = _context.Productos.FirstOrDefault(p => p.Id == producto.Id);
+
+            if (prod != null)
+            {
+                return false;
+            }
+
+            _context.Productos.Add(new Producto
+            {
+                Id = producto.Id,
+                Activo = true,
+                Descripcion = producto.Descripcion,
+                PrecioUnitario = producto.PrecioUnitario,
+                Stock = producto.Stock
+            });
             _context.SaveChanges();
             return true;
         }
 
-        public bool UpdateProduct(Producto producto)
+        public bool UpdateProduct(CreateProductoViewModel producto)
         {
             var prod = _context.Productos.FirstOrDefault(x => x.Id == producto.Id && x.Activo);
 

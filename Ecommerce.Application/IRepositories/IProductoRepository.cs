@@ -2,9 +2,9 @@
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.ViewModels;
 
-namespace Ecommerce.Application.IServices
+namespace Ecommerce.Application.IRepositories
 {
-    public interface IProductoService
+    public interface IProductoRepository
     {
         IEnumerable<ProductoDTO?> GetProductList();
         ProductoDTO? GetById(Guid id);

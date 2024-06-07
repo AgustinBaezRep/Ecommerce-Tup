@@ -1,6 +1,8 @@
-﻿using Ecommerce.Application.IServices;
-using Ecommerce.Application.Repositories;
-using ECommerce.Domain.Models;
+﻿using Ecommerce.Application.IRepositories;
+using Ecommerce.Application.IServices;
+using ECommerce.Domain.DTOs;
+using ECommerce.Domain.Entities;
+using ECommerce.Domain.ViewModels;
 
 namespace Ecommerce.Application.Services
 {
@@ -13,27 +15,22 @@ namespace Ecommerce.Application.Services
             _repository = repository;
         }
 
-        public IEnumerable<Producto?> GetProductList()
+        public IEnumerable<ProductoDTO?> GetProductList()
         {
             return _repository.GetProductList();
         }
 
-        public Producto? GetById(Guid id)
+        public ProductoDTO? GetById(Guid id)
         {
             return _repository.GetById(id);
         }
 
-        public bool CreateProduct(Producto producto)
+        public bool CreateProduct(CreateProductoViewModel producto)
         {
-            if (_repository.GetById(producto.Id) != null)
-            {
-                return false;
-            }
-
             return _repository.CreateProduct(producto);
         }
 
-        public bool UpdateProduct(Producto producto)
+        public bool UpdateProduct(CreateProductoViewModel producto)
         {
             return _repository.UpdateProduct(producto);
         }
@@ -41,6 +38,11 @@ namespace Ecommerce.Application.Services
         public bool DeleteProduct(Guid id)
         {
             return _repository.DeleteProduct(id);
+        }
+
+        public IEnumerable<ProductoConComponentesDTO> GetCombination()
+        {
+            return _repository.GetCombination();
         }
     }
 }

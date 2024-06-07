@@ -17,6 +17,30 @@ namespace ECommerce.Infraestructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
+            modelBuilder.Entity("ECommerce.Domain.Models.Componente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Precio")
+                        .HasColumnType("REAL");
+
+                    b.Property<Guid>("ProductoId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("Componentes");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Models.Producto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -40,6 +64,22 @@ namespace ECommerce.Infraestructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Productos");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Models.Componente", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Models.Producto", "Producto")
+                        .WithMany("Componentes")
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Models.Producto", b =>
+                {
+                    b.Navigation("Componentes");
                 });
 #pragma warning restore 612, 618
         }

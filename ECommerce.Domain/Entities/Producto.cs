@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.Domain.Models
+namespace ECommerce.Domain.Entities
 {
     public class Producto
     {
@@ -13,6 +13,7 @@ namespace ECommerce.Domain.Models
         public double PrecioUnitario { get; set; }
         public int? Stock { get; set; }
         public bool Activo { get; set; }
+        public ICollection<Componente> Componentes { get; set; }
 
         public Producto()
         {
